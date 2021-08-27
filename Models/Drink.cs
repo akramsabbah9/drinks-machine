@@ -1,13 +1,11 @@
-using System;
-
 namespace drinks_machine
 {
     public class Drink
     {
         // readonly: name, price; read-write: quantity
-        private string Name { get; }
-        private int Price { get; }
-        private int Quantity { get; set; }
+        public string Name { get; }
+        public int Price { get; }
+        public int Quantity { get; set; }
 
         // one constructor to initialize a vending machine drink
         public Drink(string name, int price, int initialQuantity) {

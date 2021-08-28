@@ -69,18 +69,25 @@ namespace drinks_machine.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult PurchaseDrinks([FromBody] Transaction args)
         {
+            int drinkTotal = 0;
+
             // determine if there are enough drinks to supply the request
             foreach(KeyValuePair<string, Drink> entry in args.drinks) {
                 // if there's not enough drinks, send 400
                 if (Drinks[entry.Key].Quantity == 0)
                     return BadRequest("Drink " + entry.Key + " is sold out, your purchase cannot be processed");
-                if (Drinks[entry.Key].Quantity < entry.Value.Quantity)
+                else if (Drinks[entry.Key].Quantity < entry.Value.Quantity)
                     return BadRequest("Not enough drinks, your purchase cannot be processed");
+                else
+                // add total cost for purchased drinks of this name
+                    drinkTotal += entry.Value.Quantity * Drinks[entry.Key].Price;
             }
 
             // determine if the total payment matches the total price
+            int purchaseTotal = args.payment.Sum(x => x.Value * x.Quantity);
 
-            // if everything is ok, subtract from Drinks and Change
+            if (purchaseTotal < drinkTotal)
+                return BadRequest("Payment is insufficient");
 
             /* send back the response: drinks is the number of remaining drinks
                and payment is the change back from the transaction */

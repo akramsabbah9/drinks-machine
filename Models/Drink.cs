@@ -8,12 +8,12 @@ namespace drinks_machine
         public int Quantity { get; set; }
 
         // one constructor to initialize a vending machine drink
-        public Drink(string name, int price, int initialQuantity) {
+        public Drink(string name, int price, int quantity) {
             Name = name;
             // if someone thinks it would be funny to initialize price/quantity
             // as negative, set them to zero instead
             Price = price >= 0 ? price : 0;
-            Quantity = initialQuantity >= 0 ? initialQuantity : 0;
+            Quantity = quantity >= 0 ? quantity : 0;
         }
     }
 }

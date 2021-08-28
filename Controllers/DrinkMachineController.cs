@@ -65,16 +65,18 @@ namespace drinks_machine.Controllers
         // attempt to complete a transaction. If valid, send 200 with the new
         // amt of drinks and change for this purchase. Otherwise, 400 and refund.
         [HttpPost]
-        [ProducesResponseType(
-            StatusCodes.Status200OK, 
-            Type = typeof(Transaction)
-        )]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Transaction))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult PurchaseDrinks([FromBody] Transaction args)
         {
-            if (args.drinks == null) Console.WriteLine("OKAY!");
-            if (args.payment == null) Console.WriteLine("OKAY2!");
             // determine if there are enough drinks to supply the request
+            foreach(KeyValuePair<string, Drink> entry in args.drinks) {
+                // if there's not enough drinks, send 400
+                if (Drinks[entry.Key].Quantity == 0)
+                    return BadRequest("Drink " + entry.Key + " is sold out, your purchase cannot be processed");
+                if (Drinks[entry.Key].Quantity < entry.Value.Quantity)
+                    return BadRequest("Not enough drinks, your purchase cannot be processed");
+            }
 
             // determine if the total payment matches the total price
 

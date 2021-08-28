@@ -96,16 +96,13 @@ namespace drinks_machine.Controllers
                 for (int i = Cash.Count - 1; i >= 0; i--) {
                     // calc how many coins of this denomination can fit
                     int coinCount = changeNeeded / Cash[i].Value;
+                    
+                    // if not enough coins, use up the remaining ones
+                    coinCount = (coinCount > Cash[i].Quantity) ? Cash[i].Quantity : coinCount;
 
                     // subtract the necessary coins, or as many as possible
-                    if (coinCount > Cash[i].Quantity) {
-                        changeNeeded -= Cash[i].Quantity * Cash[i].Value;
-                        change.Add(new Money(Cash[i].Value, Cash[i].Quantity));
-                    }
-                    else {
-                        changeNeeded -= coinCount * Cash[i].Value;
-                        change.Add(new Money(Cash[i].Value, coinCount));
-                    }
+                    changeNeeded -= coinCount * Cash[i].Value;
+                    change.Add(new Money(Cash[i].Value, coinCount));
                 }
 
                 // if change is still needed, send 400

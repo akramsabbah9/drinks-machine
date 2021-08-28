@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace drinks_machine.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class DrinkMachineController : ControllerBase
     {
         // make dictionary of Drink objects, and list of Money
@@ -39,7 +40,7 @@ namespace drinks_machine.Controllers
             Change.Sort((a, b) => a.Value.CompareTo(b.Value));
         }
 
-        // get state of machine
+        // get state of machine, returning drinks inside
         [HttpGet]
         public Dictionary<string, Drink> GetMachineContents()
         {
@@ -47,12 +48,27 @@ namespace drinks_machine.Controllers
             return Drinks;
         }
 
-        // attempt to complete a transaction. If valid, return new amt of drinks
-        // and subtract Money from Change. Otherwise, 400 and refund.
+        // need to return an Action Result to customize status code
+        // attempt to complete a transaction. If valid, send 200 with the new
+        // amt of drinks and change for this purchase. Otherwise, 400 and refund.
         [HttpPost]
-        public Dictionary<string, Drink> PurchaseDrinks()
+        [ProducesResponseType(
+            StatusCodes.Status200OK, 
+            Type = typeof(Tuple<Dictionary<string, Drink>, List<Money>>)
+        )]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult PurchaseDrinks(
+            Dictionary<string, Drink> drinks
+        )
         {
-            return Drinks;
+            // determine if there are enough drinks to supply the request
+
+            // determine if the total payment matches the total price
+
+            // if everything is ok, subtract from Drinks and Change
+
+            // send back the response
+            return Ok(new Tuple<Dictionary<string, Drink>, List<Money>>(drinks, Change));
         }
     }
 }

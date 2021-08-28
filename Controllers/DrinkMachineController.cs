@@ -12,13 +12,13 @@ namespace drinks_machine.Controllers
     [Route("api/[controller]")]
     public class DrinkMachineController : ControllerBase
     {
-        // make dictionary of Drink objects, and list of Money
+        // make dictionary of Drink objects, and list of Money on-hand
 
         // dictionary used to lookup drinks when receiving purchase request
         private Dictionary<string, Drink> Drinks = new Dictionary<string, Drink>();
 
-        // list of change to easily scale up when adding new types of coinage
-        private List<Money> Change = new List<Money>();
+        // list used to easily scale up when adding new types of coinage
+        private List<Money> Cash = new List<Money>();
 
         private readonly ILogger<DrinkMachineController> _logger;
 
@@ -31,20 +31,20 @@ namespace drinks_machine.Controllers
             Drinks.Add("Soda", new Drink("Soda", 45, 3));
 
             // add available money in machine
-            Change.Add(new Money(1, 100));
-            Change.Add(new Money(5, 10));
-            Change.Add(new Money(10, 5));
-            Change.Add(new Money(25, 25));
+            Cash.Add(new Money(1, 100));
+            Cash.Add(new Money(5, 10));
+            Cash.Add(new Money(10, 5));
+            Cash.Add(new Money(25, 25));
 
             // in case later devs add change out of order, sort least to greatest
-            Change.Sort((a, b) => a.Value.CompareTo(b.Value));
+            Cash.Sort((a, b) => a.Value.CompareTo(b.Value));
         }
 
         // get state of machine, returning drinks inside
         [HttpGet]
         public Dictionary<string, Drink> GetMachineContents()
         {
-            Change.ForEach(Console.WriteLine); // debug: check change amounts
+            Cash.ForEach(Console.WriteLine); // debug: check change amounts
             return Drinks;
         }
 
@@ -69,7 +69,8 @@ namespace drinks_machine.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult PurchaseDrinks([FromBody] Transaction args)
         {
-            int drinkTotal = 0;
+            int drinkTotal = 0; // total cost of purchase
+            List<Money> change = new List<Money>(); // list to hold change
 
             // determine if there are enough drinks to supply the request
             foreach(KeyValuePair<string, Drink> entry in args.drinks) {
@@ -84,14 +85,38 @@ namespace drinks_machine.Controllers
             }
 
             // determine if the total payment matches the total price
-            int purchaseTotal = args.payment.Sum(x => x.Value * x.Quantity);
+            int changeNeeded = args.payment.Sum(x => x.Value * x.Quantity) - drinkTotal;
 
-            if (purchaseTotal < drinkTotal)
+            // if changeNeeded is negative, the payment was too small
+            if (changeNeeded < 0)
                 return BadRequest("Payment is insufficient");
+            // otherwise, calculate which coins to give back, largest-first
+            else if (changeNeeded > 0) {
+                // for each denomination in Cash, make change <= changeNeeded
+                for (int i = Cash.Count - 1; i >= 0; i--) {
+                    // calc how many coins of this denomination can fit
+                    int coinCount = changeNeeded / Cash[i].Value;
+
+                    // subtract the necessary coins, or as many as possible
+                    if (coinCount > Cash[i].Quantity) {
+                        changeNeeded -= Cash[i].Quantity * Cash[i].Value;
+                        change.Add(new Money(Cash[i].Value, Cash[i].Quantity));
+                    }
+                    else {
+                        changeNeeded -= coinCount * Cash[i].Value;
+                        change.Add(new Money(Cash[i].Value, coinCount));
+                    }
+                }
+
+                // if change is still needed, send 400
+                Console.WriteLine(changeNeeded);
+                if (changeNeeded > 0)
+                    return BadRequest("Not sufficient change in the inventory");
+            }
 
             /* send back the response: drinks is the number of remaining drinks
                and payment is the change back from the transaction */
-            return Ok(new Transaction(args.drinks, args.payment));
+            return Ok(new Transaction(args.drinks, change));
         }
     }
 }

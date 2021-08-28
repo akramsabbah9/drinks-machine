@@ -36,8 +36,8 @@ namespace drinks_machine.Controllers
             Cash.Add(new Money(10, 5));
             Cash.Add(new Money(25, 25));
 
-            // in case later devs add change out of order, sort least to greatest
-            Cash.Sort((a, b) => a.Value.CompareTo(b.Value));
+            // in case later devs add change out of order, sort greatest to least
+            Cash.Sort((a, b) => b.Value.CompareTo(a.Value));
         }
 
         // get state of machine, returning drinks inside
@@ -93,7 +93,7 @@ namespace drinks_machine.Controllers
             // otherwise, calculate which coins to give back, largest-first
             else if (changeNeeded > 0) {
                 // for each denomination in Cash, make change <= changeNeeded
-                for (int i = Cash.Count - 1; i >= 0; i--) {
+                for (int i = 0; i < Cash.Count; i++) {
                     // calc how many coins of this denomination can fit
                     int coinCount = changeNeeded / Cash[i].Value;
                     
@@ -106,14 +106,28 @@ namespace drinks_machine.Controllers
                 }
 
                 // if change is still needed, send 400
-                Console.WriteLine(changeNeeded);
                 if (changeNeeded > 0)
                     return BadRequest("Not sufficient change in the inventory");
             }
 
+            // finally, remove purchased drinks and compute changes in Cash
+            foreach(KeyValuePair<string, Drink> entry in args.drinks)
+                Drinks[entry.Key].Quantity -= entry.Value.Quantity;
+
+            for(int i = 0; i < Cash.Count; i++) {
+                // if payment includes this coinage, add that value
+                Money curCoin = args.payment.Find(e => e.Value == Cash[i].Value);
+                Console.WriteLine(curCoin);
+                int plus = (curCoin != null) ? curCoin.Quantity : 0;
+                Console.WriteLine("before " + Cash[i]);
+
+                Cash[i].Quantity += plus - change[i].Quantity;
+                Console.WriteLine("after " + Cash[i]);
+            }
+
             /* send back the response: drinks is the number of remaining drinks
                and payment is the change back from the transaction */
-            return Ok(new Transaction(args.drinks, change));
+            return Ok(new Transaction(Drinks, change));
         }
     }
 }

@@ -49,12 +49,12 @@ namespace drinks_machine.Controllers
         }
 
         // define class used for post parameters
-        public class PaymentArgs
+        public class Transaction
         {
             public Dictionary<string, Drink> drinks { get; }
             public List<Money> payment { get; }
 
-            public PaymentArgs(Dictionary<string, Drink> drinks, List<Money> payment)
+            public Transaction(Dictionary<string, Drink> drinks, List<Money> payment)
             {
                 this.drinks = drinks;
                 this.payment = payment;
@@ -67,10 +67,10 @@ namespace drinks_machine.Controllers
         [HttpPost]
         [ProducesResponseType(
             StatusCodes.Status200OK, 
-            Type = typeof(Tuple<Dictionary<string, Drink>, List<Money>>)
+            Type = typeof(Transaction)
         )]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult PurchaseDrinks([FromBody] PaymentArgs args)
+        public IActionResult PurchaseDrinks([FromBody] Transaction args)
         {
             if (args.drinks == null) Console.WriteLine("OKAY!");
             if (args.payment == null) Console.WriteLine("OKAY2!");
@@ -80,8 +80,9 @@ namespace drinks_machine.Controllers
 
             // if everything is ok, subtract from Drinks and Change
 
-            // send back the response
-            return Ok(new Tuple<Dictionary<string, Drink>, List<Money>>(args.drinks, args.payment));
+            /* send back the response: drinks is the number of remaining drinks
+               and payment is the change back from the transaction */
+            return Ok(new Transaction(args.drinks, args.payment));
         }
     }
 }

@@ -48,7 +48,20 @@ namespace drinks_machine.Controllers
             return Drinks;
         }
 
-        // need to return an Action Result to customize status code
+        // define class used for post parameters
+        public class PaymentArgs
+        {
+            public Dictionary<string, Drink> drinks { get; }
+            public List<Money> payment { get; }
+
+            public PaymentArgs(Dictionary<string, Drink> drinks, List<Money> payment)
+            {
+                this.drinks = drinks;
+                this.payment = payment;
+            }
+        }
+
+        // return an Action Result to customize the response status code
         // attempt to complete a transaction. If valid, send 200 with the new
         // amt of drinks and change for this purchase. Otherwise, 400 and refund.
         [HttpPost]
@@ -57,10 +70,10 @@ namespace drinks_machine.Controllers
             Type = typeof(Tuple<Dictionary<string, Drink>, List<Money>>)
         )]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult PurchaseDrinks(
-            Dictionary<string, Drink> drinks
-        )
+        public IActionResult PurchaseDrinks([FromBody] PaymentArgs args)
         {
+            if (args.drinks == null) Console.WriteLine("OKAY!");
+            if (args.payment == null) Console.WriteLine("OKAY2!");
             // determine if there are enough drinks to supply the request
 
             // determine if the total payment matches the total price
@@ -68,7 +81,7 @@ namespace drinks_machine.Controllers
             // if everything is ok, subtract from Drinks and Change
 
             // send back the response
-            return Ok(new Tuple<Dictionary<string, Drink>, List<Money>>(drinks, Change));
+            return Ok(new Tuple<Dictionary<string, Drink>, List<Money>>(args.drinks, args.payment));
         }
     }
 }

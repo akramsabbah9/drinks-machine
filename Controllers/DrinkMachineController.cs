@@ -44,7 +44,6 @@ namespace drinks_machine.Controllers
         [HttpGet]
         public Dictionary<string, Drink> GetMachineContents()
         {
-            Cash.ForEach(Console.WriteLine); // debug: check change amounts
             return Drinks;
         }
 
@@ -117,12 +116,10 @@ namespace drinks_machine.Controllers
             for(int i = 0; i < Cash.Count; i++) {
                 // if payment includes this coinage, add that value
                 Money curCoin = args.payment.Find(e => e.Value == Cash[i].Value);
-                Console.WriteLine(curCoin);
+                
                 int plus = (curCoin != null) ? curCoin.Quantity : 0;
-                Console.WriteLine("before " + Cash[i]);
 
                 Cash[i].Quantity += plus - change[i].Quantity;
-                Console.WriteLine("after " + Cash[i]);
             }
 
             /* send back the response: drinks is the number of remaining drinks

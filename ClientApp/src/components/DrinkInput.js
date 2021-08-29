@@ -29,6 +29,7 @@ function DrinkInput({ name, drink, formState }) {
             name={name}
             id={name}
             min="0"
+            max={drink.quantity}
             onChange={handleChange}
             disabled={(drink.quantity) ? false : true}
         />

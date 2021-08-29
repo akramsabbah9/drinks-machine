@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import CoinInput from "./CoinInput";
 import DrinkInput from "./DrinkInput";
+import { scrubDrinks, validateForm } from "../utils/helpers";
 import './DrinkMachine.css';
 
 // track coin and drink inputs in form, then fetch on submit.
@@ -18,6 +19,8 @@ function DrinkMachine() {
     const [coins, setCoins] = useState(coinTypes);
     const [inventory, setInventory] = useState({});
     const [drinks, setDrinks] = useState({});
+    const [error, setError] = useState("");
+
 
     // on render, set the values of inventory and drinks
     useEffect(() => {
@@ -31,11 +34,7 @@ function DrinkMachine() {
             setInventory(data);
 
             // then scrub quantities from data and set as initial drinks value
-            const scrubbedData = {};
-
-            for(const [key, value] of Object.entries(data)) {
-                scrubbedData[[key]] = { ...value, quantity: 0 };
-            }
+            const scrubbedData = scrubDrinks(data);
             
             setDrinks(scrubbedData);
         };
@@ -48,13 +47,13 @@ function DrinkMachine() {
         }
     }, []);
 
+
     // submit form, awaiting response. Then update drinks and show modal
     const handleSubmit = async event => {
         event.preventDefault();
-
-        console.log("clicked")
         
         // validate: nonzero drink quantities & payment total, non-neg coins
+        if (!validateForm(coins, drinks, setError)) return false;
 
         const response = await fetch("api/drinkmachine", {
             method: "POST",
@@ -71,7 +70,14 @@ function DrinkMachine() {
         }
         const data = await response.json();
 
-        // upon receiving the updated data and change, render modal and clear form
+        // upon receiving the updated data and change, render modal
+        console.log(data);
+
+        // clear form and its state
+        // event.target.reset(); // this will lead to handleReset
+        setInventory(data.drinks);
+        // setDrinks(scrubDrinks(data.drinks));
+        // setCoins(coinTypes);
     };
 
     return (<>
@@ -128,6 +134,9 @@ function DrinkMachine() {
                     >GET DRINKS</button>
                 </div>
                 {/* error message display */}
+                {error
+                    ? <span className="error">Error: {error}</span>
+                    : <br />}
             </form>
         </Container>
     </>)

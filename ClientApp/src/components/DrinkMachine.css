@@ -6,6 +6,10 @@ input {
     border: 5px solid black;
 }
 
+input:disabled {
+    background-color: lightgray;
+}
+
 button {
     background-color: white;
     border-width: 3px;
@@ -21,4 +25,10 @@ button {
 
 .order-total {
     text-align: center;
+}
+
+.error {
+    font-weight: 700;
+    background-color: red;
+    padding: 6px;
 }

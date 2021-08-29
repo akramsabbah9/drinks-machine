@@ -65,4 +65,20 @@ const totalCost = drinks => {
         .reduce((p, n) => p + n);
 };
 
-export { scrubDrinks, validateForm, resetForm, totalCost };
+// returns name of a given coin value.
+const coinName = (value, quantity = 2) => {
+    const coinage = {
+        1: { singular: "penny", plural: "pennies" },
+        5: { singular: "nickel", plural: "nickels" },
+        10: { singular: "dime", plural: "dimes" },
+        25: { singular: "quarter", plural: "quarters" }
+    }
+
+    // if value is not in coinage, short circuit to a catch-all
+    const val = coinage[value]
+        || { singular: `${value}-cent coin`, plural: `${value}-cent coins` };
+
+    return (quantity === 1) ? val.singular : val.plural;
+};
+
+export { scrubDrinks, validateForm, resetForm, totalCost, coinName };

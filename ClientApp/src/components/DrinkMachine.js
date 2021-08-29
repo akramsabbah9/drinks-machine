@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import CoinInput from "./CoinInput";
 import DrinkInput from "./DrinkInput";
-import { scrubDrinks, validateForm, resetForm } from "../utils/helpers";
+import ReceiptModal from "./ReceiptModal";
+import { scrubDrinks, validateForm, resetForm, totalCost } from "../utils/helpers";
 import './DrinkMachine.css';
 
 // track coin and drink inputs in form, then fetch on submit.
@@ -22,6 +23,8 @@ function DrinkMachine() {
     const [drinks, setDrinks] = useState({});
     const [error, setError] = useState("");
     const [idList, setInputIds] = useState([]);
+    const [showModal, setModal] = useState(false); // modal toggle
+    const [modalData, setModalData] = useState({}); // modal data
 
 
     // on render, set the values of inventory and drinks
@@ -79,31 +82,29 @@ function DrinkMachine() {
         const data = await response.json();
 
         // upon receiving the updated data and change, render modal
-        // TODO
-        console.log(data);
+        setModalData({
+            drinks: drinks,
+            total: totalCost(drinks),
+            change: data.payment
+        });
+        setModal(true);
 
         // clear form and its state
-        // event.target.reset(); // this will lead to handleReset
         resetForm(idList);
         setInventory(data.drinks);
         setDrinks(scrubDrinks(data.drinks));
         setCoins(coinTypes);
     };
 
-    // const handleReset = event => {
-    //     event.preventDefault();
-    //     const form = document.querySelector("#vending-machine");
-    //     const changeEvent = new Event("change", { bubbles: true });
-    //     console.log(form.children);
-    //     // for (item in form.children) {
-    //     //     item.dispatchEvent(changeEvent);
-    //     // }
-    //     form.dispatchEvent(changeEvent);
-    // };
-
     return (<>
+        {/* modal for purchase receipt */}
+        <ReceiptModal
+            show={showModal}
+            setModal={setModal}
+            data={modalData}
+        />
         <Container fluid="md" className="px-md-5">
-            <form id="vending-machine" className="p-3" onSubmit={handleSubmit} /*onReset={handleReset}*/>
+            <form id="vending-machine" className="p-3" onSubmit={handleSubmit}>
                 {/* coins list */}
                 <h2>Coin Information</h2>
                 <br />
@@ -140,9 +141,7 @@ function DrinkMachine() {
                         {/* if drinks are set, tally up their total cost. */}
                         <span>
                             {Object.keys(drinks).length
-                                ? Object.keys(drinks)
-                                    .map(name => drinks[name].quantity * drinks[name].price)
-                                    .reduce((p, n) => p + n)
+                                ? totalCost(drinks)
                                 : 0} cents
                         </span>
                     </Col>
@@ -151,7 +150,7 @@ function DrinkMachine() {
                 <div className="d-flex justify-content-end pr-3">
                     <button
                         type="submit"
-                        className="btn-outline-dark"
+                        className="btn-outline-dark purchase-button"
                     >GET DRINKS</button>
                 </div>
                 {/* error message display */}

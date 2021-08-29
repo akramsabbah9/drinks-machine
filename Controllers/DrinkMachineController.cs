@@ -77,7 +77,6 @@ namespace drinks_machine.Controllers
             }
 
 
-
             // determine if there are enough drinks to supply the request
             foreach(KeyValuePair<string, Drink> entry in args.drinks) {
                 // if there's not enough drinks, send 400
@@ -109,7 +108,8 @@ namespace drinks_machine.Controllers
                     int coinCount = changeNeeded / Cash[i].Value;
                     
                     // if not enough coins, use up the remaining ones
-                    coinCount = (coinCount > Cash[i].Quantity) ? Cash[i].Quantity : coinCount;
+                    int onHand = Cash[i].Quantity + args.payment.Find(e => e.Value == Cash[i].Value).Quantity;
+                    coinCount = (coinCount > onHand) ? onHand : coinCount;
 
                     // subtract the necessary coins, or as many as possible
                     changeNeeded -= coinCount * Cash[i].Value;

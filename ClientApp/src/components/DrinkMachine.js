@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
+import CoinTypes from "../utils/cointypes";
 import CoinInput from "./CoinInput";
 import DrinkInput from "./DrinkInput";
 import ReceiptModal from "./ReceiptModal";
@@ -9,12 +10,7 @@ import './DrinkMachine.css';
 // track coin and drink inputs in form, then fetch on submit.
 // if 200, load receipt modal and clear form, otherwise display error.
 function DrinkMachine() {
-    const coinTypes = [
-        { name: "Pennies", value: 1, quantity: 0 },
-        { name: "Nickels", value: 5, quantity: 0 },
-        { name: "Dimes", value: 10, quantity: 0 },
-        { name: "Quarters", value: 25, quantity: 0 }
-    ];
+    const coinTypes = CoinTypes.generateCoinTypes();
 
     // coins: coins to use. inventory: drinks in machine. drinks: drinks to be purchased.
     // error: error to display, if any. idList: list of inputs to clear after form submit.

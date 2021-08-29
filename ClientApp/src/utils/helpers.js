@@ -1,4 +1,5 @@
 /* helper functions for DrinkMachine component */
+import CoinTypes from "../utils/cointypes";
 
 // scrub drinks data returned from API
 const scrubDrinks = data => {
@@ -67,15 +68,10 @@ const totalCost = drinks => {
 
 // returns name of a given coin value.
 const coinName = (value, quantity = 2) => {
-    const coinage = {
-        1: { singular: "penny", plural: "pennies" },
-        5: { singular: "nickel", plural: "nickels" },
-        10: { singular: "dime", plural: "dimes" },
-        25: { singular: "quarter", plural: "quarters" }
-    }
+    const coinNames = CoinTypes.generateCoinNames();
 
-    // if value is not in coinage, short circuit to a catch-all
-    const val = coinage[value]
+    // if value is not in coinNames, short circuit to a catch-all
+    const val = coinNames[value]
         || { singular: `${value}-cent coin`, plural: `${value}-cent coins` };
 
     return (quantity === 1) ? val.singular : val.plural;

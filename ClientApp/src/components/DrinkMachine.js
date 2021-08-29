@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col } from "reactstrap";
 import CoinInput from "./CoinInput";
 import DrinkInput from "./DrinkInput";
-import { scrubDrinks, validateForm } from "../utils/helpers";
+import { scrubDrinks, validateForm, resetForm } from "../utils/helpers";
 import './DrinkMachine.css';
 
 // track coin and drink inputs in form, then fetch on submit.
@@ -16,13 +16,16 @@ function DrinkMachine() {
     ];
 
     // coins: coins to use. inventory: drinks in machine. drinks: drinks to be purchased.
+    // error: error to display, if any. idList: list of inputs to clear after form submit.
     const [coins, setCoins] = useState(coinTypes);
     const [inventory, setInventory] = useState({});
     const [drinks, setDrinks] = useState({});
     const [error, setError] = useState("");
+    const [idList, setInputIds] = useState([]);
 
 
     // on render, set the values of inventory and drinks
+    // also set ids of form inputs to idList
     useEffect(() => {
         const initialFetch = async () => {
             // fetch drink data from machine and set initial inventory
@@ -30,13 +33,18 @@ function DrinkMachine() {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
+
             const data = await response.json();
             setInventory(data);
 
             // then scrub quantities from data and set as initial drinks value
             const scrubbedData = scrubDrinks(data);
-            
             setDrinks(scrubbedData);
+
+            // finally, set form input ids based off coin and drink names
+            const inputIds = coinTypes.map(e => e.name);
+            Object.keys(data).forEach(drink => inputIds.push(drink));
+            setInputIds(inputIds);
         };
 
         try {
@@ -65,24 +73,37 @@ function DrinkMachine() {
 
         // if server sends back 400, display the error message and clear form
         if (!response.ok) {
-            console.log(response);
-            return;
+            let text = await response.text();
+            return setError(text);
         }
         const data = await response.json();
 
         // upon receiving the updated data and change, render modal
+        // TODO
         console.log(data);
 
         // clear form and its state
         // event.target.reset(); // this will lead to handleReset
+        resetForm(idList);
         setInventory(data.drinks);
-        // setDrinks(scrubDrinks(data.drinks));
-        // setCoins(coinTypes);
+        setDrinks(scrubDrinks(data.drinks));
+        setCoins(coinTypes);
     };
+
+    // const handleReset = event => {
+    //     event.preventDefault();
+    //     const form = document.querySelector("#vending-machine");
+    //     const changeEvent = new Event("change", { bubbles: true });
+    //     console.log(form.children);
+    //     // for (item in form.children) {
+    //     //     item.dispatchEvent(changeEvent);
+    //     // }
+    //     form.dispatchEvent(changeEvent);
+    // };
 
     return (<>
         <Container fluid="md" className="px-md-5">
-            <form id="vending-machine" className="p-3" onSubmit={handleSubmit}>
+            <form id="vending-machine" className="p-3" onSubmit={handleSubmit} /*onReset={handleReset}*/>
                 {/* coins list */}
                 <h2>Coin Information</h2>
                 <br />

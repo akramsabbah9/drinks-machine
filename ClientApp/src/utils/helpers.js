@@ -51,4 +51,10 @@ const validateForm = (coins, drinks, setError) => {
     return true;
 };
 
-export { scrubDrinks, validateForm };
+const resetForm = ids => {
+    for (let id of ids) {
+        document.querySelector(`#${id}`).value = null;
+    }
+};
+
+export { scrubDrinks, validateForm, resetForm };

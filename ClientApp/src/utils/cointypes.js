@@ -1,6 +1,6 @@
 /* define all coin types this application uses for easier scaling */
 const CoinTypes = class {
-    constructor(height, width) {
+    constructor() {
         // define a coinage array to hold the coin types.
         /* each object in coinage will have:
         name: the plural form of the coin type, ie. quarters

@@ -7,10 +7,11 @@ import ReceiptModal from "./ReceiptModal";
 import { scrubDrinks, validateForm, resetForm, totalCost } from "../utils/helpers";
 import './DrinkMachine.css';
 
+const coinTypes = CoinTypes.generateCoinTypes();
+
 // track coin and drink inputs in form, then fetch on submit.
 // if 200, load receipt modal and clear form, otherwise display error.
 function DrinkMachine() {
-    const coinTypes = CoinTypes.generateCoinTypes();
 
     // coins: coins to use. inventory: drinks in machine. drinks: drinks to be purchased.
     // error: error to display, if any. idList: list of inputs to clear after form submit.

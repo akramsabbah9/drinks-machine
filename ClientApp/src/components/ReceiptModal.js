@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import React from "react";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { coinName } from "../utils/helpers";
 
 // modal to display receipt of purchase after completed transaction.

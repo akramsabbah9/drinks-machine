@@ -1,5 +1,4 @@
 import React from "react";
-import { Row, Col } from "reactstrap";
 
 // a single reusable input for a drink. updates its state on change.
 function DrinkInput({ name, drink, formState }) {

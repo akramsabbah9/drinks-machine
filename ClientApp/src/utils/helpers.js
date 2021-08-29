@@ -51,10 +51,18 @@ const validateForm = (coins, drinks, setError) => {
     return true;
 };
 
+// clears all inputs in a form, given a list of their ids.
 const resetForm = ids => {
     for (let id of ids) {
         document.querySelector(`#${id}`).value = null;
     }
 };
 
-export { scrubDrinks, validateForm, resetForm };
+// returns the total cost of a set of drinks, in cents.
+const totalCost = drinks => {
+    return Object.keys(drinks)
+        .map(name => drinks[name].quantity * drinks[name].price)
+        .reduce((p, n) => p + n);
+};
+
+export { scrubDrinks, validateForm, resetForm, totalCost };

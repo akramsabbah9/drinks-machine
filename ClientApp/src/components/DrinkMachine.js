@@ -102,12 +102,24 @@ function DrinkMachine() {
                                 key={name}
                                 name={name}
                                 drink={inventory[name]}
-                                inventory={inventory}
                                 formState={[drinks, setDrinks]}
                             />
                         )}
                     </ul>
-                    {/* Order Total */}
+                    {/* Order Total: get total cost of all purchased drinks */}
+                    <div>
+                        <h4>Order Total:</h4>
+                        {/* if drinks are set, tally up their total cost. */}
+                        <span>
+                            {Object.keys(drinks).length
+                                ? Object.keys(drinks)
+                                    .map(name => drinks[name].quantity * drinks[name].price)
+                                    .reduce((p, n) => p + n)
+                                : 0} cents
+                            {/* {coins.map(e => e.quantity * e.value)
+                                .reduce((p, n) => p + n)} cents */}
+                        </span>
+                    </div>
                 </div>
                 {/* submit button */}
                 <div className="d-flex justify-content-end">

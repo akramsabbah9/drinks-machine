@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container } from "reactstrap";
 import CoinInput from "./CoinInput";
+import DrinkInput from "./DrinkInput";
 
 // track coin and drink inputs in form, then fetch on submit.
 // if 200, load receipt modal and clear form, otherwise display error.
@@ -91,11 +92,20 @@ function DrinkMachine() {
                     )}
                 </div>
                 <br />
+                <h2>Product Information</h2>
+                <br />
                 <div className="d-flex">
                     {/* products list */}
-                    <h2>Product Information</h2>
-                    <ul>
-                        {/* drinks here */}
+                    <ul className="pl-3">
+                        {Object.keys(drinks).map(name =>
+                            <DrinkInput
+                                key={name}
+                                name={name}
+                                drink={inventory[name]}
+                                inventory={inventory}
+                                formState={[drinks, setDrinks]}
+                            />
+                        )}
                     </ul>
                     {/* Order Total */}
                 </div>

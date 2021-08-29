@@ -10,7 +10,7 @@ input:disabled {
     background-color: lightgray;
 }
 
-button {
+.purchase-button {
     background-color: white;
     border-width: 3px;
     border-top-left-radius: 25px 10px;

@@ -6,14 +6,13 @@ function CoinInput({ index, coin, state }) {
 
     // update coins state when this input is changed
     const handleChange = event => {
-        const { type, name, value } = event.target;
+        const { value } = event.target;
 
         const quantity = parseInt(value) || 0; // short circuit to zero
         
         // deep copy coins and set new value
         const newCoins = [ ...coins ];
         newCoins[index] = { ...coin, quantity };
-        console.log(newCoins);
         
         setCoins(newCoins);
     };

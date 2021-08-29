@@ -10,8 +10,6 @@ function DrinkInput({ name, drink, formState }) {
 
         const quantity = parseInt(value) || 0; // short circuit to zero
 
-        console.log( { ...drinks, [name]: { ...drink, quantity } } );
-        
         // set drinks state with new value
         setDrinks({ ...drinks, [name]: { ...drink, quantity } });
     };
@@ -25,13 +23,14 @@ function DrinkInput({ name, drink, formState }) {
                 Cost = {drink.price}
             </span>
         </div>
-        {/* form input */}
+        {/* disable form input if drink quantity is zero */}
         <input
             type="number"
             name={name}
             id={name}
             min="0"
             onChange={handleChange}
+            disabled={(drink.quantity) ? false : true}
         />
     </li>);
 }

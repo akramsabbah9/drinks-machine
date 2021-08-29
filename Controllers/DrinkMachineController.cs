@@ -69,12 +69,19 @@ namespace drinks_machine.Controllers
         public IActionResult PurchaseDrinks([FromBody] Transaction args)
         {
             int drinkTotal = 0; // total cost of purchase
-            List<Money> change = new List<Money>(); // list to hold change
+
+            // initialize list to hold change, deep-copying Cash
+            List<Money> change = new List<Money>();
+            foreach(Money entry in Cash) {
+                change.Add(new Money(entry.Value, 0));
+            }
+
+
 
             // determine if there are enough drinks to supply the request
             foreach(KeyValuePair<string, Drink> entry in args.drinks) {
                 // if there's not enough drinks, send 400
-                if (Drinks[entry.Key].Quantity == 0)
+                if (Drinks[entry.Key].Quantity == 0 && entry.Value.Quantity != 0)
                     return BadRequest("Drink " + entry.Key + " is sold out, your purchase cannot be processed");
                 else if (Drinks[entry.Key].Quantity < entry.Value.Quantity)
                     return BadRequest("Not enough drinks, your purchase cannot be processed");
@@ -82,6 +89,11 @@ namespace drinks_machine.Controllers
                 // add total cost for purchased drinks of this name
                     drinkTotal += entry.Value.Quantity * Drinks[entry.Key].Price;
             }
+
+            // if no drinks were actually bought, send 400
+            if (drinkTotal == 0)
+                return BadRequest("No drinks were purchased");
+            
 
             // determine if the total payment matches the total price
             int changeNeeded = args.payment.Sum(x => x.Value * x.Quantity) - drinkTotal;
@@ -101,13 +113,14 @@ namespace drinks_machine.Controllers
 
                     // subtract the necessary coins, or as many as possible
                     changeNeeded -= coinCount * Cash[i].Value;
-                    change.Add(new Money(Cash[i].Value, coinCount));
+                    change[i].Quantity = coinCount;
                 }
 
                 // if change is still needed, send 400
                 if (changeNeeded > 0)
                     return BadRequest("Not sufficient change in the inventory");
             }
+
 
             // finally, remove purchased drinks and compute changes in Cash
             foreach(KeyValuePair<string, Drink> entry in args.drinks)

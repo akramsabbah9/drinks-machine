@@ -1,4 +1,5 @@
 import React from "react";
+import { Row, Col } from "reactstrap";
 
 // a single reusable input for a drink. updates its state on change.
 function DrinkInput({ name, drink, formState }) {
@@ -14,7 +15,7 @@ function DrinkInput({ name, drink, formState }) {
         setDrinks({ ...drinks, [name]: { ...drink, quantity } });
     };
 
-    return (<li className="d-flex justify-content-between">
+    return (<li className="d-flex justify-content-between mb-3">
         {/* drink name, quantity and price */}
         <div className="d-flex flex-column">
             <label htmlFor={name} className="h5">{name}</label>
@@ -25,6 +26,7 @@ function DrinkInput({ name, drink, formState }) {
         </div>
         {/* disable form input if drink quantity is zero */}
         <input
+            className="w-25"
             type="number"
             name={name}
             id={name}

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Container } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import CoinInput from "./CoinInput";
 import DrinkInput from "./DrinkInput";
+import './DrinkMachine.css';
 
 // track coin and drink inputs in form, then fetch on submit.
 // if 200, load receipt modal and clear form, otherwise display error.
@@ -75,13 +76,11 @@ function DrinkMachine() {
 
     return (<>
         <Container fluid="md" className="px-md-5">
-            <h1>Insert Coins</h1>
-            <br />
-            <form id="vending-machine" onSubmit={handleSubmit}>
+            <form id="vending-machine" className="p-3" onSubmit={handleSubmit}>
                 {/* coins list */}
                 <h2>Coin Information</h2>
                 <br />
-                <div className="d-flex justify-content-between">
+                <div className="d-flex flex-wrap px-3 justify-content-between">
                     {coins.map((coin, index) =>
                         <CoinInput
                             key={coin.name}
@@ -94,8 +93,9 @@ function DrinkMachine() {
                 <br />
                 <h2>Product Information</h2>
                 <br />
-                <div className="d-flex">
+                <Row className="d-flex">
                     {/* products list */}
+                    <Col md>
                     <ul className="pl-3">
                         {Object.keys(drinks).map(name =>
                             <DrinkInput
@@ -106,9 +106,10 @@ function DrinkMachine() {
                             />
                         )}
                     </ul>
+                    </Col>
                     {/* Order Total: get total cost of all purchased drinks */}
-                    <div>
-                        <h4>Order Total:</h4>
+                    <Col className="my-auto pb-4 ml-4 order-total" md>
+                        <span className="h3">Order Total: </span>
                         {/* if drinks are set, tally up their total cost. */}
                         <span>
                             {Object.keys(drinks).length
@@ -116,14 +117,15 @@ function DrinkMachine() {
                                     .map(name => drinks[name].quantity * drinks[name].price)
                                     .reduce((p, n) => p + n)
                                 : 0} cents
-                            {/* {coins.map(e => e.quantity * e.value)
-                                .reduce((p, n) => p + n)} cents */}
                         </span>
-                    </div>
-                </div>
+                    </Col>
+                </Row>
                 {/* submit button */}
-                <div className="d-flex justify-content-end">
-                    <button type="submit">GET DRINKS</button>
+                <div className="d-flex justify-content-end pr-3">
+                    <button
+                        type="submit"
+                        className="btn-outline-dark"
+                    >GET DRINKS</button>
                 </div>
                 {/* error message display */}
             </form>

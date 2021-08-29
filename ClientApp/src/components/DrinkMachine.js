@@ -85,6 +85,7 @@ function DrinkMachine() {
         setModalData({
             drinks: drinks,
             total: totalCost(drinks),
+            payment: coins,
             change: data.payment
         });
         setModal(true);

@@ -32,7 +32,7 @@ const validateForm = (coins, drinks, setError) => {
     }
 
     // if any drink is negative, set error
-    for(const key in Object.keys(drinks)) {
+    for(const key of Object.keys(drinks)) {
         if (drinks[key].quantity < 0) {
             setError(`You cannot purchase a negative amount of drinks!`);
             return false;
@@ -47,6 +47,7 @@ const validateForm = (coins, drinks, setError) => {
     }
 
     // getting to here means the form state is valid.
+    setError("");
     return true;
 };
 

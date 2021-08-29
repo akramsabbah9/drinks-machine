@@ -72,9 +72,13 @@ function ReceiptModal({ show, setModal, data }) {
                 </p>
             </div>
             {/* coinage of change */}
-            <div className="d-flex justify-content-end">
-                <p>({listMoney(change)})</p>
-            </div>
+            {totalMoney(change) !== 0 
+                ? (
+                    <div className="d-flex justify-content-end">
+                        <p>({listMoney(change)})</p>
+                    </div>
+                )
+                : null}
 
         </ModalBody>
         <ModalFooter>

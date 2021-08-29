@@ -30,7 +30,7 @@ function ReceiptModal({ show, setModal, data }) {
             {/* display purchased drinks */}
             <div className="d-flex justify-content-end">
                 {/* list in format of NAME, X drinks */}
-                <ul>
+                <ul className="purchased-drinks-list">
                 {(data.drinks)
                     ? Object.keys(drinks)
                         .filter(d => drinks[d].quantity > 0)
@@ -68,8 +68,7 @@ function ReceiptModal({ show, setModal, data }) {
             <h4>Change Received</h4>
             {/* total change */}
             <div className="d-flex justify-content-end">
-                <p>{totalMoney(change)} cents
-                </p>
+                <p>{totalMoney(change)} cents</p>
             </div>
             {/* coinage of change */}
             {totalMoney(change) !== 0 

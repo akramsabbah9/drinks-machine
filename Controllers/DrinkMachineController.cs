@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,26 +14,31 @@ namespace drinks_machine.Controllers
         // make dictionary of Drink objects, and list of Money on-hand
 
         // dictionary used to lookup drinks when receiving purchase request
-        private Dictionary<string, Drink> Drinks = new Dictionary<string, Drink>();
+        private static readonly Dictionary<string, Drink> Drinks = new Dictionary<string, Drink>();
 
         // list used to easily scale up when adding new types of coinage
-        private List<Money> Cash = new List<Money>();
+        private static readonly List<Money> Cash = new List<Money>();
 
         private readonly ILogger<DrinkMachineController> _logger;
+        // private IMemoryCache _cache; // add in-memory cache to store state
 
         public DrinkMachineController(ILogger<DrinkMachineController> logger)
         {
             _logger = logger;
             // add drinks
-            Drinks.Add("Coke", new Drink("Coke", 25, 5));
-            Drinks.Add("Pepsi", new Drink("Pepsi", 36, 15));
-            Drinks.Add("Soda", new Drink("Soda", 45, 3));
+            if (Drinks.Count == 0) {
+                Drinks.Add("Coke", new Drink("Coke", 25, 5));
+                Drinks.Add("Pepsi", new Drink("Pepsi", 36, 15));
+                Drinks.Add("Soda", new Drink("Soda", 45, 3));
+            }
 
             // add available money in machine
-            Cash.Add(new Money(1, 100));
-            Cash.Add(new Money(5, 10));
-            Cash.Add(new Money(10, 5));
-            Cash.Add(new Money(25, 25));
+            if (Cash.Count == 0) {
+                Cash.Add(new Money(1, 100));
+                Cash.Add(new Money(5, 10));
+                Cash.Add(new Money(10, 5));
+                Cash.Add(new Money(25, 25));
+            }
 
             // in case later devs add change out of order, sort greatest to least
             Cash.Sort((a, b) => b.Value.CompareTo(a.Value));
